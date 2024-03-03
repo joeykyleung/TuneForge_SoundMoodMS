@@ -1,0 +1,10 @@
+.ipynb*
+data/mp3*
+data/defacto_database/
+data/.DS_STORE
+__pycache__/
+.pytest_cache/
+model_development/
+deprecated_model/
+test.txt
+.gitignore
