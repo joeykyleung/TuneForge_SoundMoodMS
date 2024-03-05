@@ -1,8 +1,29 @@
 import os
 from flask import Flask, request, jsonify
-from project import predict
+import predict
+from storage import azureStorage
+import logging
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
+@app.route('/api/blob_upload', methods=['POST'])
+def upload_blob():
+    blob_in = request.get_json().get('wav')
+    if not blob_in:
+        app.logger.warning('Conversion request received with no \'wav\' field.')
+        return 'Error', 500
+
+    blob_out = 'uploads/' + blob_in
+    app.logger.info('Downloading WAV:' + blob_in)
+    try:
+        azureStorage.download(blob_out, blob_in)
+    except Exception as e:
+        app.logger.error(e)
+        return 'Error', 500
+    return 'Upload success', 200
+
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
@@ -22,13 +43,15 @@ def upload_file():
 
     return jsonify({'message': 'File uploaded successfully'}), 200
 
-@app.route('/api/predict', methods = ['GET'])
+
+@app.route('/api/predict', methods=['GET'])
 def predict_mood():
     folder_path = "uploads/"
 
     # Get a list of all files in the folder
-    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
-    
+    files = [f for f in os.listdir(folder_path) if
+             os.path.isfile(os.path.join(folder_path, f))]
+
     # Get the full path of each file
     file_paths = [os.path.join(folder_path, f) for f in files]
 

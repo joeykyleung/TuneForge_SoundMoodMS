@@ -1,5 +1,6 @@
 import pytest
-from project import predict
+# from project import predict
+import predict
 
 TEST_WAV_FILE = "data/unit_testing/test.wav"
 

@@ -1,5 +1,5 @@
-import project.cnn_model.audio_cnn as audio_cnn
-from project.audio_processing import audio_signature
+import cnn_model.audio_cnn as audio_cnn
+from audio_processing import audio_signature
 import torch
 
 INPUT_SHAPE = (12,431)
