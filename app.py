@@ -15,7 +15,10 @@ def upload_blob():
         app.logger.warning('Conversion request received with no \'wav\' field.')
         return 'Error', 500
 
-    blob_out = 'uploads/' + blob_in
+    directory = 'uploads/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    blob_out = directory + blob_in
     app.logger.info('Downloading WAV:' + blob_in)
     try:
         azureStorage.download(blob_out, blob_in)
