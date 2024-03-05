@@ -8,6 +8,8 @@ WORKDIR /python-docker
 COPY . .
 
 # Install any needed packages specified in requirements.txt
+RUN apt-get update
+RUN apt-get -y install libsndfile1
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
