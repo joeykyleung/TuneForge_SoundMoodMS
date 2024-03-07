@@ -10,22 +10,23 @@ logging.basicConfig(level=logging.INFO)
 
 @app.route('/api/blob_upload', methods=['POST'])
 def upload_blob():
+    app.logger.info('Blob upload request received:' + request.get_json())
     blob_in = request.get_json().get('wav')
     if not blob_in:
-        app.logger.warning('Conversion request received with no \'wav\' field.')
-        return 'Error', 500
+        app.logger.warning('Warning: Conversion request received '
+                           + 'with no \'wav\' field.')
+        return 'Error: Conversion request received with no \'wav\' field.', 422
 
     directory = 'uploads/'
     if not os.path.exists(directory):
         os.makedirs(directory)
     blob_out = directory + blob_in
-    app.logger.info('Downloading WAV:' + blob_in)
     try:
         azureStorage.download(blob_out, blob_in)
     except Exception as e:
         app.logger.error(e)
-        return 'Error', 500
-    return 'Upload success', 200
+        return 'Error: Could not download from blob storage.', 500
+    return 'Success: File downloaded successfully from blob storage.', 200
 
 
 @app.route('/api/upload', methods=['POST'])
@@ -49,6 +50,7 @@ def upload_file():
 
 @app.route('/api/predict', methods=['GET'])
 def predict_mood():
+    app.logger.info('Model prediction request received. Processing...')
     folder_path = "uploads/"
 
     # Get a list of all files in the folder
@@ -63,4 +65,5 @@ def predict_mood():
         output.append(predict.predict_mood(file))
         os.remove(file)
 
+    app.logger.info('Model prediction output: ' + str(output))
     return jsonify(output), 200
